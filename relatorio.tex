@@ -73,6 +73,11 @@ As próximas seções apresentam o detalhamento destas atividades.
 
 \section{A Interface}
 
+A interface implementada é composta de uma extensão do Arcabouço Ensemble,
+que consiste de várias classes Java e de algumas abstrações Pure Data.
+Esta seção descreve com detalhes a implementação das classes e abstrações,
+e discute os problemas encontrados e as soluções adotadas.
+
 \subsection{Classes Java}
 
 Esta seção apresenta uma descrição detalhada da interface Ensemble-Pd,
@@ -139,6 +144,13 @@ comunicação entre \textit{patches} e aplicações que usam a libpd.
 Esta classe também é responsável por registrar e gerenciar símbolos
 usados na comunicação do Ensemble com o \textit{patch}, centralizando
 o envio e recebimento de mensagens, áudio e demais informações.
+
+A padronização dos símbolos utilizados nos componentes e mensagens
+de uma aplicação Ensemble-Pd permite que o ciclo de processamento
+dos \textit{patches} de aplicação seja centralizado pela classe
+\textbf{PdServer}, pois garante que não haverão ambiguidades entre
+destinatários/remetentes e que nenhuma mensagem será perdida
+entre ciclos de processamento.
 
 \subsubsection{PdAudioBlock}
 
