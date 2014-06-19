@@ -71,6 +71,8 @@ As próximas seções apresentam o detalhamento destas atividades.
 
 \section{O Protocolo}
 
+%Dividir como no Artigo?
+
 \section{A Interface}
 
 A interface implementada é composta de uma extensão do Arcabouço Ensemble,
@@ -347,11 +349,6 @@ Durante o semestre, o aluno desenvolveu um repositório git~\cite{ensemble_git}
 com exemplos de uso da libpd junto às linguagens C e Java,
 adquirindo familiaridade e prática com o uso desta biblioteca.
 
-% Retirei a seção de aplicações da libpd. Ela estava aqui porque eu tinha
-% pesquisado sobre essas aplicações para o seminário, e achei que elas
-% ajudavam a contextualizar a libpd, mas vi que já apresentei bastantes usos
-% do Pd no relatório passado.
-
 \section{Ensemble}
 
 O Ensemble é um arcabouço para a construção de Sistemas Musicais Multiagentes, 
@@ -464,27 +461,6 @@ entrada/saída de áudio através de código Java, caso essas bibliotecas
 tenham sido implementadas nessa linguagem, ou através de código nativo
 com a JNI.
 
-\subsection{Refatorações do Código Fonte}\label{sec:refatoracoes}
-
-\begin{figure}[H]
-  \centering
-  %\includegraphics[scale=0.41]{./ensemble_refactoring.jpg}
-  \caption{Exemplo de Refatoração do Ensemble (ferramenta \textit{diff} 
-  do \textbf{GitHub})}
-  \label{fig2}
-\end{figure}
-
-Foram feitas algumas alterações no código
-fonte do Ensemble visando melhorar a legibilidade
-e visualização. Nomes de variáveis foram modificados
-para melhor refletir sua função e propósito no código, 
-e alguns blocos foram reorganizados para facilitar
-futura extensão.
-
-A Figura abaixo exemplifica algumas das modificações feitas,
-que podem ser visualizadas completamente no repositório
-\textbf{git} do Ensemble~\cite{ensemble_git}.
-
 \subsection{Código e Documentação}
 
 O código e a documentação do Arcabouço Ensemble podem ser encontrados
@@ -573,32 +549,6 @@ de \textit{patches} Pd, independentemente do uso ou não de funções específic
 
 \subsection{Diagrama de Classes}\label{sec:diagrama}
 
-As classes \textit{Pd\_Agent\_Class\_Information} e \textit{Pd\_Agent\_Instance}
-são utilizadas na inicialização de uma aplicação do Ensemble que utilize um
-\textit{patch} como arquivo de configuração. Elas representam os tipos e classes
-(\textit{Pd\_Agent\_Class\_Information}) de Agente Musicais definidos, e as
-diferentes instâncias de cada tipo de Agente (\textit{Pd\_Agent\_Instance}). Cada tipo de
-Agente, assim como cada instância, pode ter seus argumentos e parâmetros
-definidos independentemente.
-
-As instâncias das classes \textit{Pd\_Message} e \textit{Pd\_Float}, armazenadas
-por uma instância de \textit{Pd\_Receiver}, encapsulam as mensagens e
-números enviados por um \textit{patch} ao Ensemble, e facilitam a manipulação
-e o acesso a fonte e conteúdos dos mesmos.
-
-A classe \textit{Pd\_Constants} contém os símbolos padrão que o Ensemble
-reconhece em \textit{patches} e os paramêtros de configuração de áudio
-do Pure Data, como taxa de amostragem e tamanho de bloco de amostras.
-
-O armazenamento de amostras de áudio provenientes do Pd é feito pela
-classe \textit{Pd\_Audio\_Buffer}, e a classe \textit{Pd\_SoundEventServer}
-é responsável por tocar essas amostras.
-
-Em implementações a serem realizadas no próximo semestre, o servidor de eventos
-deverá fornecer essas amostras, encapsuladas como eventos, 
-ao ciclo de processamento de áudio do Ensemble.
-
-\newpage
 \end{multicols}
 \begin{figure}[H]
   \centering
@@ -610,65 +560,14 @@ ao ciclo de processamento de áudio do Ensemble.
 \newpage
 \section{Disciplinas Cursadas}
 
-Durante o semestre, foram cursadas duas disciplinas no IME e uma na ECA.
+Durante o semestre, foram cursadas três disciplinas no IME.
 Esta seção fará um breve comentário sobre cada uma delas.
 
-\subsection{Algoritmos para Processamento de Áudio, Imagem e Vídeo}
+\subsection{Conceitos Fundamentais de Linguagens de Programação}
 
-Nesta disciplina o aluno foi apresentado às teorias e conceitos relacionados 
-a análise, síntese, desenho e implementação de filtros e transformações sobre 
-sinais de áudio, imagem e vídeo. Além disso, apresentou-se, através
-de exemplos em sala de aula, o ferramental computacional relacionado a 
-esses conceitos.
+\subsection{Laboratório de Programação Extrema}
 
-\subsection{Laboratório de Programação II}
-
-Esta disciplina abordou temas variados, como linguagens interpretadas voltadas a
-programação de \textit{scripts}, introdução a Programação Orientada 
-a Objetos, linguagens de alto nível e expressões regulares.
-
-Durante a disciplina, foi desenvolvida uma máquina virtual em Perl,
-composta de um compilador e interpretador de uma
-linguagem de montagem simples. Além disso, foi implementado um programa
-de maior porte na linguagem Java, que reimplementa os trabalhos anteriores
-e consiste de um arcabouço para máquinas virtuais num ambiente virtual.
-
-\subsection{Processamento de Sinais Musicais: Técnicas e Percepção}
-
-Cursada na Escola de Comunicação e Artes no Departamento de Música, abordou 
-temas relacionados à percepção do som, conectando propriedades psicofísicas 
-a seus correlatos teóricos - como por exemplo, o desenho de filtros orientado
-pela percepção resultante de sua aplicação.
-
-\section{Cronograma}
-
-No próximo semestre serão implementadas extensões da estrutura de integração,
-que passem as amostras de áudio obtidas do Pure Data ao ciclo de processamento
-do Ensemble. 
-
-Além disso, extensões das classes de Servidores de Eventos e Agentes Ambiente
-do Ensemble devem permitir a \textit{patches} controlar o fluxo e estrutura
-de aplicações, podendo por exemplo adicionar ou remover Agentes e seus 
-componentes e alterar propriedades do Ambiente Virtual, continuando a
-integrar o arcabouço e a linguagem Pure Data.
-
-\end{multicols}
-
-\begin{table}[H]
-\centering
-
-\begin{tabular}{|c|c|c|c|}
-\hline 
- & 1º Semestre & 2º Semestre & 3º Semestre \\ \hline 
-Revisão da Literatura & X &  &  \\ \hline 
-Estudos de Documentação e Código & X & X &  \\ \hline
-Implementação da Interface &  & X & X \\ \hline 
-Análises de Desempenho &  & X & X \\ \hline 
-Experimentos de Interatividade &  &  & X \\ \hline 
-\end{tabular} 
-
-\caption{Desenvolvimento do Projeto}
-\end{table}
+\subsection{Princípios de Interação Humano-Computador}
 
 \newpage
 \bibliographystyle{plain}
