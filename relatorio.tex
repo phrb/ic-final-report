@@ -75,15 +75,54 @@ As próximas seções apresentam o detalhamento destas atividades.
 
 \subsection{Classes Java}
 
+Esta seção apresenta uma descrição detalhada da interface Ensemble-Pd,
+justificando as principais classes Java utilizadas, expondo suas 
+interrelações e contextualizando seu papel no funcionamento de aplicações
+do Ensemble.
+
 \subsubsection{PdAgent}
+
+Esta classe é uma extensão da classe \textbf{MusicalAgent} do Ensemble,
+e suas instâncias representam agentes musicais numa aplicação.
+O mapeamento de um agente definido num \textit{patch} e sua representação no 
+Ensemble é feito através dessa classe.
+
+Os componentes de um Agente, como Raciocínio, Atuadores e Sensores, são
+adicionados a \textbf{PdAgent} através de mensagens definidas dentro do
+\textit{patch}. Atuadores e Sensores são representados pelas classes 
+\textbf{PdActuator} e \textbf{PdSensor}, respectivamente.
+
+O Servidor de Eventos de uma aplicação Ensemble-Pd é responsável por garantir 
+que a representação de um Agente num \textit{patch} receba e envie Eventos, 
+Mensagens e Áudio de e para o Ambiente Virtual e outros Agentes. Isso é feito
+através de Sensores e Atuadores especiais, inseridos por padrão em instâncias
+de \textbf{PdAgent}, e que permitem essa comunicação.
 
 \subsubsection{PdReasoning}
 
+O raciocínio de um Agente numa aplicação Ensemble-Pd é definido dentro do
+\textit{subpatch}/abstração correspondente a esse Agente, e consiste de
+uma aplicação Pd que pode conter qualquer objeto Pd utilizado em aplicações
+tradicionais. De dentro do \textit{patch} de Raciocínio, o programador Pd tem 
+acesso à informação recebida pelo Agente através dos Sensores que ele definiu,
+podendo utilizar os recursos de Processamento de Sinais implementados no Pure
+Data para produzir e processar amostras de áudio e demais informações 
+recebidas, e pode atuar no Ambiente Virtual através dos Atuadores do Agente.
+
 \subsubsection{PdEvent}
+
+Esta classe encapsula, no funcionamento de uma aplicação Ensemble,
+as mensagens e informações provenientes e destinadas a \textit{patches} Pd.
+
+Os tipos manipulados por esta classe são \textbf{PdFloat}, \textbf{PdMessage} e
+\textbf{PdAudioBlock}, que por sua vez encapsulam os diferentes tipos de dados
+tratados pelo Pure Data.
 
 \subsubsection{PdServer}
 
 \subsubsection{PdReceiver}
+
+\subsubsection{PdAudioBlock}
 
 \subsection{Abstrações no Pure Data}
 
