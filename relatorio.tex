@@ -13,6 +13,7 @@
 \usepackage{xcolor}
 \usepackage{makeidx}
 \usepackage{hyperref}
+\usepackage{textcomp}
 
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
 
@@ -62,9 +63,33 @@ largamente extendida durante este semestre, permitindo a definição de
 Agentes Musicais, seus Raciocínios e Componentes e até aplicações
 completas do Arcabouço Ensemble através de \textit{patches} Pure Data.
 
-
+Submetemos um artigo para a Conferência Conjunta ICMC/SMC 2014~\cite{},
+detalhando o protocolo e a interface desenvolvidos. O artigo foi aceito
+para publicação e apresentação oral na Conferência.
 
 As próximas seções apresentam o detalhamento destas atividades.
+
+\section{O Protocolo}
+
+\section{A Interface}
+
+\subsection{Classes Java}
+
+\subsubsection{PdAgent}
+
+\subsubsection{PdReasoning}
+
+\subsubsection{PdEvent}
+
+\subsubsection{PdServer}
+
+\subsubsection{PdReceiver}
+
+\subsection{Abstrações no Pure Data}
+
+\subsubsection{act\textasciitilde e sense\textasciitilde}
+
+\subsubsection{read\_memory\textasciitilde e read\_fact}
 
 \section{Pure Data}
 
@@ -141,9 +166,6 @@ Nesse processo, são removidas algumas das características
 que dão independência à execução do Pd, e torna-se 
 mais fácil utilizar \textit{patches} no contexto de outras aplicações.
 
-% Com o termo "engine de som", eu quis dizer um mecanismo de geração de
-% amostras de áudio, que dependem de controle e entradas
-% da aplicação.
 Um \textit{patch} pode ser utilizado como um gerador de áudio,
 que modifica sua saída de acordo com entradas fornecidas pela
 aplicação que executa o \textit{patch}, produzindo amostras 
@@ -267,7 +289,7 @@ estarão vinculados a um Agente Ambiente.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.35]{./ensemble_sniffer_ext.jpg}
+  %\includegraphics[scale=0.35]{./ensemble_sniffer_ext.jpg}
   \caption{Exemplo de Extensão do Ensemble}
   \label{fig2}
 \end{figure}
@@ -335,7 +357,7 @@ com a JNI.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.41]{./ensemble_refactoring.jpg}
+  %\includegraphics[scale=0.41]{./ensemble_refactoring.jpg}
   \caption{Exemplo de Refatoração do Ensemble (ferramenta \textit{diff} 
   do \textbf{GitHub})}
   \label{fig2}
@@ -469,7 +491,7 @@ ao ciclo de processamento de áudio do Ensemble.
 \end{multicols}
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=0.39]{./class_diag.jpg}
+  %\includegraphics[scale=0.39]{./class_diag.jpg}
   \label{fig2}
 \end{figure}
 \begin{multicols}{2}
