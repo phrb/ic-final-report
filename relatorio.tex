@@ -120,9 +120,69 @@ tratados pelo Pure Data.
 
 \subsubsection{PdServer}
 
+Esta é a principal classe do ponto de vista da sincronização 
+e mapeamento entre \textit{patches} e aplicações Ensemble.
+Ela é quem centraliza e coordena a execução de um \textit{patch}, utilizando
+a classe \textbf{PdProcessor}, e processa as mensagens e dados recebidos do Pd 
+através da classe \textbf{PdReceiver}, produzindo Eventos para os Sensores 
+dos Agentes a que essas mensagens se destinam.
+
+Além disso, é ela quem processa os Eventos enviados por Atuadores de Agentes,
+reproduzindo no \textit{patch} as mudanças feitas pelos Agentes.
+
 \subsubsection{PdReceiver}
 
+Esta é uma extensão da classe \textbf{PdDispatcher} contida na implementação
+Java da libpd, e encapsula as funções de \textit{callback} usadas na
+comunicação entre \textit{patches} e aplicações que usam a libpd.
+
+Esta classe também é responsável por registrar e gerenciar símbolos
+usados na comunicação do Ensemble com o \textit{patch}, centralizando
+o envio e recebimento de mensagens, áudio e demais informações.
+
 \subsubsection{PdAudioBlock}
+
+Durante a implementação da interface, desenvolvemos duas diferentes estratégias
+para a transferência de amostras de áudio entre o \textit{patch} e o Ensemble, 
+uma centralizada e uma distribuída, finalmente optando pela centralização 
+do ciclo de processamento na classe \textbf{PdServer}.
+
+A estratégia distribuída consistia na descentralização dos ciclos de
+processamento da libpd, permitindo que cada Raciocínio de um Agente
+inserido numa aplicação processasse seu \textit{subpatch} independentemente,
+tratando suas próprias mensagens e amostras de áudio separadamente.
+
+Essa estratégia gera problemas de sincronização de Eventos e Áudio,
+decorrentes do funcionamento dos dois softwares envolvidos.
+
+As amostras de áudio produzidas num mesmo momento pelos Agentes 
+num \textit{patch} devem ser tocadas como seriam num \textit{patch}
+processado pelo Pd, e as mensagens enviadas pelos Agentes devem obedecer
+uma sequência definida pelo Raciocínio, também definido num \textit{patch}.
+Se cada Agente é capaz de processar o \textit{patch} de aplicação
+no seu ciclo de processamento no Ensemble, não é possível garantir que ele
+não receberá ou enviará Eventos ou Áudio somente após todos os outros Agentes 
+recebam seu "turno" de Eventos, pois o controle de tempo execução dos Agentes 
+é feito pelo middleware JADE, e não tem conexão com o ciclo de processamento
+da libpd.
+
+Como o \textit{patch} de configuração de aplicação é único, o controle de
+processamento descentralizado produz desencontros nas amostras de Áudio, 
+e também no fluxo de Eventos da aplicação.
+
+A solução de processamento centralizado resolve estes problemas utilizando
+as abstrações Pd \textbf{act\textasciitilde} e \textbf{sense\textasciitilde},
+e as classes Java \textbf{PdAudioBlock} e \textbf{PdAudioBlockStream}.
+
+Essas classes representam um bloco de processamento do Pure Data, e um
+encadeamento temporal desses blocos, respectivamente. Elas permitem
+receber amostras de Áudio de cada Atuador independentemente, e enviar
+amostras a Sensores de forma sincronizada, pois cada Sensor e Atuador
+tem seu próprio \textbf{PdAudioBlockStream}.
+
+O Servidor de Eventos pode então enviar e receber Áudio e Eventos de Agentes,
+mantendo a sincronia entre a execução do Ensemble e o processamento 
+do \textit{patch}.
 
 \subsection{Abstrações no Pure Data}
 
