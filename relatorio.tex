@@ -16,6 +16,7 @@
 \usepackage{textcomp}
 
 \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\newcommand{\pdobject}[1]{\begin{center}\fbox{\texttt{#1}}\end{center}}
 
 \begin{document}
 
@@ -71,7 +72,200 @@ As próximas seções apresentam o detalhamento destas atividades.
 
 \section{O Protocolo}
 
-%Dividir como no Artigo?
+With the libpd Java bindings, it is possible to divert all requests to any 
+given agent reasoning (in Java) to a call to libpd that causes a Pd patch 
+to be executed, and to collect any data produced by this patch back to 
+the reasoning for further processing by Ensemble (through its actuators, 
+event servers, etc). In such a context the Java-written reasoning is 
+nothing more than a generic \emph{wrapper} that requires only a 
+few parameter inputs (e.g. the Pd patch filename that contains 
+the actual reasoning).
+
+In order for this wrapper-reasoning to work, the Pd patch has to adhere to a 
+certain protocol, using specific Pd objects and a well-defined syntax to 
+gain access to the structures contained in the agent's representation in 
+Ensemble. This protocol should define Pd objects for accessing and modifying 
+memories corresponding to existing sensors and actuators and for retrieving 
+and storing data in a knowledge base, which are essential operations in 
+the design of any reasoning. Furthermore, this protocol should also specify 
+Pd objects to create and modify agents and components, and also to define 
+characteristics of the virtual world that were formerly configured 
+in an XML initialization file.
+
+This protocol, defined in the sequel, should aim at complete transparency 
+(from the user point-of-view) with respect to inner workings of the Ensemble 
+framework, that will still be carried out by its Java kernel. In practical 
+terms, no knowledge of the Ensemble Java classes and code should be required 
+from the user of Ensemble through this Pd Ensemble protocol. Ideally, the Pd 
+Ensemble user should not be even aware that any data is coming from or 
+going to the Ensemble Java kernel outside Pd.
+
+\subsection{Environment}
+
+Ensemble applications can be configured and initialized by an XML file parsed 
+by a loader class, where the user defines the application's components, such 
+as Event Servers, Worlds and its Laws, Musical Agents and their Sensors and 
+Actuators. The Ensemble-Pd interface allows these configuration parameters to 
+be defined by message arguments sent to symbols that Ensemble subscribe to. 
+These messages should be sent at the moment the patch is loaded by Ensemble's 
+Pd instance.
+
+Messages sent to the \textbf{global} symbol define Ensemble's clock, 
+schedule and process modes; messages sent to the \textbf{environment} 
+symbol define the Environment Agent, World and Laws; and messages sent to 
+the \textbf{add\_agent} symbol define Musical Agent names that will be added 
+to the application, and whose definition should be in subpatches inside the 
+configuration patch. Table\ref{tab:startupsymbols} shows the Pd symbols and 
+objects used in the initialization, their arguments and usage.
+
+\end{multicols}
+
+\begin{table}[h]
+    \begin{center}
+        \begin{tabular}{|l|l|l|}
+            \hline
+            Symbol/Object & Arguments & Usage \\
+            \hline
+        \textbf{global} & \begin{tabular}[c]{@{}l@{}}<clock\_mode>\\<process\_mode>\\<scheduler\_threads>\end{tabular} & \begin{tabular}[c]{@{}l@{}}Sets\\execution\\parameters\end{tabular} \\
+            \hline   
+        \textbf{environment} & \begin{tabular}[c]{@{}l@{}}<class>\\<world>\\<\textit{world\_class}>\\ {[}<\textit{world\_law}>]\end{tabular} & \begin{tabular}[c]{@{}l@{}}Sets\\environment\\and world\\parameters\end{tabular} \\
+            \hline
+        \textbf{add\_agent} & <name> & \begin{tabular}[c]{@{}l@{}}Adds\\an Agent\end{tabular}\\
+            \hline
+        \textbf{[r <\textit{agent}>/start]} & & \begin{tabular}[c]{@{}l@{}}Receives\\agent\\startup bang\end{tabular} \\
+            \hline   
+        \end{tabular}
+    \end{center}
+    \caption{Application Startup Symbols.}
+    \label{tab:startupsymbols}
+\end{table}
+
+\begin{multicols}{2}
+
+\subsection{Sensors and Actuators}
+
+Every Musical Agent added to the Pd application has its own subpatch, where 
+its Reasoning, Actuators, Sensors, Memories and Knowledge Base are defined and 
+configured via messages, which are sent to Ensemble symbols when the framework 
+is ready to start processing that Agent. This is done to prevent Ensemble from 
+losing the agent configuration messages, because at the moment of loading the 
+patch Ensemble has not yet received the agents' names, and so could not have 
+subscribed to their symbols. Table\ref{tab:actuatorsandsensors} shows the Pd 
+symbols and objects used in Sensor and Actuator creation and communication, 
+their arguments and usage.
+
+\end{multicols}
+
+\begin{table}[h]
+    \begin{center}
+        \begin{tabular}{|l|l|l|}
+            \hline
+            Symbol/Object & Arguments & Usage \\
+            \hline
+        \textbf{add\_actuator} & \begin{tabular}[c]{@{}l@{}}<name>\\<type>\\ {[}<scope>]\end{tabular} & Adds a new Actuator \\
+            \hline   
+        \textbf{add\_sensor} & \begin{tabular}[c]{@{}l@{}}<name>\\<type>\\ {[}<scope>]\end{tabular} & Adds a new Sensor \\
+            \hline
+            \textbf{remove\_actuator} & <name> & Removes an Actuator \\
+            \hline
+            \textbf{remove\_sensor} & <name> & Removes a Sensor \\
+            \hline
+        \textbf{[s \textit{actuator\_name}]} & \begin{tabular}[c]{@{}l@{}}<data>\\ {[}<scope>]\end{tabular} & \begin{tabular}[c]{@{}l@{}}Writes data \\ to \textit{actuator\_name}\end{tabular} \\
+            \hline
+        \textbf{[r \textit{sensor\_name}]} & & \begin{tabular}[c]{@{}l@{}}Receives data\\from \textit{sensor\_name}\end{tabular} \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Actuators and Sensors Symbols.}
+    \label{tab:actuatorsandsensors}
+\end{table}
+
+\begin{multicols}{2}
+
+Ensemble starts agent processing by sending (through libpd) a bang to the 
+symbol \texttt{<\textit{agent}>/start} (see Table\ref{tab:startupsymbols}) 
+which will be received in the application's patch by a Pd object 
+\pdobject{r <\textit{agent}>/start} Messages in the patch connected to this 
+object should contain the names and parameters for the desired components and 
+Knowledge Base facts. Messages in the patch sent to the symbol corresponding 
+to the agent name are used to create components; for instance sending a 
+message to a symbol \texttt{<agent>} with contents \textbf{add\_actuator} 
+or \textbf{add\_sensor} initialize (in Ensemble) the corresponding Sensors 
+and Actuators, and also define the type of Event that this component will 
+handle; optionally this message can define a scope, allowing for private 
+communication between selected actuators and sensors.
+
+\subsection{Knowledge Base}
+
+Adding facts to the Knowledge Base at agent startup time is done by sending a 
+message with the fact name and value to the symbol \textbf{new\_fact}. 
+Facts can later be recovered by sending messages to the object 
+\pdobject{read\_fact <agent\_name>} which receives a fact name in its 
+inlet and returns the value in its outlet (assuming the fact exists in the 
+agent's Knowledge Base). Updating the fact in the agent's Knowledge Base 
+is done via messages to the object \pdobject{update\_fact <agent\_name>} that 
+receives a fact name and new value in its inlet and updates the Knowledge Base 
+accordingly. In Table\ref{tab:kbprotocol} are the Pd symbols and objects used in 
+creating, accessing, removing and updating a fact in the Agent's Knowledge 
+Base, their arguments and usage.
+
+\end{multicols}
+
+\begin{table}[h]
+    \begin{center}
+        \begin{tabular}{|l|l|l|}
+            \hline
+            Symbol/Object & Arguments & Usage \\
+            \hline
+        \textbf{new\_fact} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<value>\end{tabular} & Adds a new Fact\\
+            \hline   
+        \textbf{update\_fact} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<value>\end{tabular} & \begin{tabular}[c]{@{}l@{}}Updates a\\fact if it\\exists\end{tabular}\\
+            \hline
+            \textbf{remove\_fact} & name & Removes a Fact\\
+            \hline
+        \textbf{[read\_fact]} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<value>\end{tabular}
+                              & \begin{tabular}[c]{@{}l@{}}Reads a \\Fact and\\returns a value\end{tabular}\\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Knowledge Base Symbols.}
+    \label{tab:kbprotocol}
+\end{table}
+
+\begin{multicols}{2}
+
+\subsection{Memories}
+
+In the same way, different types of Agent Memories can be created and read 
+from with messages to the symbols \textbf{new\_memory} and 
+\textbf{read\_memory}. To read from a memory, a message must specify a 
+memory name and a time value; when writing to a memory (e.g. an actuator's 
+memory), the value sent to the symbol \textbf{write\_memory} is written in the 
+specified Memory at the current processing time. Table\ref{tab:memprotocol} 
+presents the Pd symbols and objects used in Memory creation, writing and 
+reading, their arguments and usage.
+
+\end{multicols}
+
+\begin{table}[h]
+    \begin{center}
+        \begin{tabular}{|l|l|l|}
+            \hline
+            Symbol/Object & Arguments & Usage \\
+            \hline
+        \textbf{new\_memory} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<type>\\\end{tabular} & Adds a new Memory \\
+            \hline 
+        \textbf{write\_memory} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<value>\end{tabular} & \begin{tabular}[c]{@{}l@{}}Writes to a \\Memory at\\current time\end{tabular} \\
+            \hline
+        \textbf{read\_memory} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<time>\end{tabular} & \begin{tabular}[c]{@{}l@{}}Reads a \\Memory and\\returns a value\end{tabular} \\
+            \hline
+        \end{tabular}
+    \end{center}
+    \caption{Memory Symbols.}
+    \label{tab:memprotocol}
+\end{table}
+
+\begin{multicols}{2}
 
 \section{A Interface}
 
@@ -231,264 +425,18 @@ Pure Data, são utilizadas para a comunicação dos demais tipos de dados.
 
 \subsubsection{read\_memory\textasciitilde e read\_fact}
 
+Estas abstrações são utilizadas para acessar informações da Base
+de Conhecimentos ou da Memória de Agentes numa aplicação. O objeto
+\textbf{read\_memory\textasciitilde} é usado para ler a Memória de
+sinais de Áudio de um Atuador ou Sensor de um Agente, e possui
+um \textit{outlet} através do qual o \textit{patch} recebe o sinal
+de Áudio correspondente ao Componente e intervalo temporal determinados
+na inicialização do objeto.
 
-
-\section{Pure Data}
-
-A linguagem de programação visual Pure Data, ou \textbf{Pd}~\cite{puckette97}, 
-é uma ferramenta tradicionalmente utilizada por músicos no processo de criação
-e composição de material musical~\cite{leandro11}. 
-
-A entrada de um programa em Pure Data é tratada como
-um fluxo de informação, que é direcionado e processado
-em blocos, produzindo uma saída em tempo real.
-
-A linguagem fornece abstrações de alto nível que encapsulam
-diversas funcionalidades, como operações matemáticas,
-de entrada/saída, e outras operações sobre sinais.
-
-Um programa é composto pela conexão dessas
-funcionalidades, ou objetos, e é chamado de patch.
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{|l|}\hline
-        Pure Data\\[0.07in]
-        \begin{tabular}{|l|}\hline
-            Interface Gráfica\\\hline
-            \\
-            Múltiplos Patches;\\
-            Threading;\\
-            Controle Temporal;\\
-            Processamento de Sinais;\\
-            \\
-            \hline
-            API de Áudio\\[0.07in]
-            \hline
-        \end{tabular}
-        \\
-        \\
-        \hline
-    \end{tabular}    
-    \caption{Estrutura do Pure Data - Execução Independente.}
-\end{table}
-
-Trabalhando com entradas (\textit{inlets}) e saídas (\textit{outlets}) ligadas 
-entre si através de \textit{patches}, é possível estruturar blocos de 
-processamento e gerenciar fluxos de áudio ao longo do tempo.
-
-O Pure Data fornece um ambiente de desenvolvimento
-capaz de execução independente, e ferramentas potentes
-voltadas a aplicações sonoras e musicais, porém essas 
-características estão amarradas a interfaces de usuário 
-e APIs de áudio que são direcionadas a certos formatos de aplicação.
-
-A Tabela 1 ilustra a estrutura de uma instância do Pure Data
-enquanto executa e edita \textit{patches}. Além da interface
-gráfica e da saída de áudio, é possível trocar informação com um patch através
-de mensagens OSC, entrada/saída de amostras e mensagens de outro \textit{patch}.
-
-\subsection{libpd}
-
-A libpd é uma biblioteca de funções que permite utilizar patches e 
-funcionalidades do Pure Data no contexto de outras aplicações,
-encapsulando e simplificando a interface do Pure Data com o
-desenvolvedor e com outras linguagens de programação~\cite{libpd1}.
-
-Uma aplicação que utiliza a libpd deve se preocupar com a inicialização do Pd
-e de suas funções para callback, e com a chamada dos métodos 
-de processamento nos momentos em que precisar de amostras de áudio.
-
-Ao encapsular a interface do Pure Data, a libpd
-permite a utilização de funções nativas, patches e funções de 
-bibliotecas externas do Pure Data no contexto de aplicações em 
-diferentes linguagens e plataformas.
-
-Nesse processo, são removidas algumas das características
-que dão independência à execução do Pd, e torna-se 
-mais fácil utilizar \textit{patches} no contexto de outras aplicações.
-
-Um \textit{patch} pode ser utilizado como um gerador de áudio,
-que modifica sua saída de acordo com entradas fornecidas pela
-aplicação que executa o \textit{patch}, produzindo amostras 
-dependentes do contexto dessa aplicação, e que serão utilizadas 
-por ela quando necessário.
-
-Outro exemplo de utilização de \textit{patches} é o processamento de
-amostras de áudio produzidas pela aplicação, e neste caso é possível
-pensar no \textit{patch} como uma biblioteca de Processamento Digital
-de Sinais, que pode receber amostras de áudio e sinais de controle e produzir
-amostras processadas, que serão utilizadas pela aplicação.
-
-% Sobre "interface com o usuário", o que quis dizer foi isso:
-Um \textit{patch} pode ainda ser utilizado de forma estática, como 
-mecanismo de controle e configuração da aplicação, enviando mensagens
-sem necessariamente processar ou produzir áudio.
-
-A Tabela 2 ilustra o encapsulamento do Pure Data através dos
-métodos e abstrações implementados pela libpd. O código cliente
-mantém controle sobre sua execução, e comanda os ciclos de 
-processamento do Pd, definindo a taxa de amostragem, tamanho
-de bloco, e quantos blocos serão recebidos por ciclo de processamento.
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{|l|}\hline
-        Código Cliente\\[0.07in]
-        \begin{tabular}{|l|}\hline
-            GUI do Código Cliente\\\hline
-            \\
-            Código de Alto Nível;\\
-            Threading;\\
-            Controle Temporal;\\
-            \\
-            \begin{tabular}{|l|}\hline
-                libpd\\[0.07in]
-                \begin{tabular}{|l|}\hline
-                    Pure Data\\\hline
-                    \\
-                    Múltiplos Patches;\\
-                    Processamento de Sinais;\\
-                    \\
-                    \hline
-                \end{tabular}
-                \\
-                \\
-                \hline
-            \end{tabular}
-            \\
-            \\
-            \hline
-            API de Áudio do Código Cliente\\[0.07in]
-            \hline
-        \end{tabular}
-        \\
-        \\
-        \hline
-    \end{tabular}
-        \caption{Estrutura de Código Cliente encapsulo o Pd com a libp.}
-\end{table}
-
-O código cliente pode então tratar um patch como
-uma "caixa-preta" que recebe e devolve amostras
-e dados, desde que o patch respeite convenções
-de símbolos \textit{send} e \textit{receive}.
-
-Durante o semestre, o aluno desenvolveu um repositório git~\cite{ensemble_git}
-com exemplos de uso da libpd junto às linguagens C e Java,
-adquirindo familiaridade e prática com o uso desta biblioteca.
-
-\section{Ensemble}
-
-O Ensemble é um arcabouço para a construção de Sistemas Musicais Multiagentes, 
-desenvolvido e descrito por Thomaz~\cite{leandro11} e 
-Santiago~\cite{santiago12}, e tem como público alvo a comunidade de músicos que
-utiliza o computador como ferramenta de criação musical, fornecendo os serviços
-e ferramentas necessários para a criação de Sistemas Musicais Multiagentes. 
-
-O arcabouço contém uma série de classes que permitem fácil extensão pelo
-código cliente, além de um complexo sistema interno para
-controle temporal e de execução.
-
-A programação de novos componentes para o Ensemble requer conhecimento de seu 
-funcionamento, e deve seguir as convenções de programação do arcabouço. 
-
-\subsection{Arquitetura}
-
-A arquitetura~\cite{leandro11} do Ensemble segue o paradigma de programação 
-orientada a objetos, exigindo uma linguagem capaz de implementá-lo.
-
-A presente implementação do Ensemble foi codificada em linguagem Java, a fim de
-permitir que aplicações musicais possam ser executadas em plataformas distintas
-
-A arquitetura utiliza o middleware para sistemas multiagentes JADE~\cite{belli99}, 
-que provê a infraestrutura necessária para manter o ciclo de vida dos Agentes e
-controlar a troca de mensagens entre eles.
-
-São utilizadas principalmente três funcionalidades do JADE na implementação do
-Ensemble, o serviço de agendamento de tarefas, o mecanismo de troca de mensagem
-entre os agentes e o serviço de diretório.
-
-\subsubsection{Arquitetura de Aplicação}
-
-Uma aplicação do Ensemble deve estender e utilizar um conjunto de classes
-específicas, dependente das funcionalidades desejadas. Apesar disso,
-toda aplicação deve ser composta de alguns componentes-chave. 
-
-É necessário definir um Agente Ambiente e um Mundo, que serão as classes
-utilizadas pelo Ensemble para controlar a execução da aplicação,
-e fornecerão um ambiente virtual específico para os Agentes Musicais.
-
-A aplicação pode então adicionar Agentes Musicais e seus componentes, 
-como Raciocínios, Bases de Conhecimento, Atuadores e Sensores, e esses
-componentes também terão sua execução controlada pelo Ensemble, pois
-estarão vinculados a um Agente Ambiente.
-
-\begin{figure}[H]
-  \centering
-  %\includegraphics[scale=0.35]{./ensemble_sniffer_ext.jpg}
-  \caption{Exemplo de Extensão do Ensemble}
-  \label{fig2}
-\end{figure}
-
-A Figura 1 demonstra, através do Sniffer, a arquitetura de uma extensão simples
-do arcabouço, que conta com três Agentes emissores de notas
-MIDI no Ambiente Virtual. Note a Base de Conhecimentos, 
-o Raciocínio e um Atuador cadastrados
-para cada Agente Musical. Ainda é possível observar os
-parâmetros contidos na Base de Conhecimentos de cada
-Agente, referentes às características do som que eles emitem.
-
-O usuário deve escolher a interface de áudio que vai utilizar,
-e definir os tipos de eventos que serão tratados por sua aplicação.
-Isso é feito através da extensão das classes de Servidores de Eventos.
-As classes de Atuadores e Sensores definirão o tratamento dos tipos
-de eventos cadastrados pelos Servidores de Evento.
-
-O aluno implementou diversas extensões, detalhadas na seção~\ref{sec:refatoracoes},  que extendem
-o arcabouço em diferentes níveis. 
-
-\subsection{Interfaces}
-
-O Ensemble é capaz de interagir com sistemas externos, usuários ou 
-bibliotecas de processamento de áudio, e tem suporte a vários protocolos de 
-comunicação. Essas interfaces permitem incorporar recursos de processamento sonoro 
-ou ferramentas para criação e gerenciamento de Agentes, que provêm de outras 
-bibliotecas e enriquecem as funcionalidades do arcabouço.
-
-Uma interface gráfica, baseada no Agente \textit{Sniffer} disponível no middleware 
-JADE~\cite{belli99}, permite o controle e monitoramento visual do sistema.
-
-Essa interface permite o envio de mensagens customizadas para um determinado 
-componente do sistema, a criação e destruição de Agentes musicais, e a inserção e 
-remoção de componentes e Ambientes. Além disso, é possível visualizar todos os 
-Agentes, componentes registrados e seus estados internos, e alterar qualquer um de 
-seus parâmetros~\cite{leandro11}.
-
-O arcabouço Ensemble é capaz de se comunicar via protocolo Open Sound 
-Control, podendo receber mensagens enviadas por \textit{patches}
-Pure Data e enviar suas próprias mensagens~\cite{leandro11}. 
-
-Essa comunicação permite a um \textit{patch} Pd ter acesso a estados e 
-parâmetros do Ambiente Ensemble e de Agentes no arcabouço.
-
-O protocolo de comunicação Open Sound Control é uma sintaxe que permite troca de 
-mensagens entre computadores, sintetizadores e softwares, possui um sistema de 
-nomenclatura capaz de endereçamento de mensagens a múltiplos destinatários, 
-mecanismos de pacotes de mensagens (\textit{bundles}) e controles 
-temporais de alta resolução (\textit{time tags})~\cite{wright97}.
-
-O Ensemble tem incorporadas duas bibliotecas Java para processamento digital de 
-sinais, a aubio~\cite{aubio01} e a LibXtract~\cite{libx01}.
-
-Para interfaces de entrada/saída de áudio, podem ser utilizados o 
-JACK~\cite{jack01}, o PortAudio~\cite{port01} e o JavaSound~\cite{jsnd01}, 
-todos através da JNI (Java Native Interface)~\cite{JNI}.
-
-É possível incorporar novas bibliotecas de processamento sonoro ou de 
-entrada/saída de áudio através de código Java, caso essas bibliotecas
-tenham sido implementadas nessa linguagem, ou através de código nativo
-com a JNI.
+O objeto \textbf{read\_fact} lê da Base de Conhecimentos de um Agente
+o Fato cujo nome de identificação é definido em sua inicialização, ou
+através de mensagens. O \textit{patch} acessa esse Fato através do
+\textit{outlet} deste objeto.
 
 \subsection{Código e Documentação}
 
@@ -498,84 +446,7 @@ O projeto tem uma página~\cite{ensemblegrouppage} no site do Grupo de Computaç
 Musical do IME, e o código pode ser obtido seguindo as instruções na própria página
 onde está hospedado.
 
-\section{Integração do Pd ao Ensemble}
-
-O encapsulamento da libpd (através dos bindings para Java) foi utilizado na 
-construção da estrutura necessária ao uso de \textit{patches} no fluxo de 
-execução do Ensemble. A integração foi feita, inicialmente, como uma aplicação,
-isto é, uma extensão das classes já implementadas, e a transposição para o 
-núcleo do arcabouço será feita assim que a integração estiver completa.
-
-O ponto central dessa integração é a classe \textit{Pd\_Receiver}, uma extensão
-de uma classe da libpd, responsável pela definição das funções de 
-\textit{callback} para as mensagens de \textit{patches} e pelo tratamento,
-armazenagem e fornecimento dessas mensagens a classes do Ensemble.
-
-As funções definidas pela \textit{Pd\_Receiver} são chamadas, nos momentos 
-adequados, pela instância do Pure Data que é executada no contexto do Ensemble,
-passando mensagens, \textbf{floats}, \textbf{bangs} e amostras de áudio
-de um \textit{patch} para dentro de uma aplicação do arcabouço.
-
-Utilizando a comunicação do Ensemble com \textit{patches} Pd, é possível
-estender classes do arcabouço para que utilizem \textit{patches} como controle
-de execução, mecanismo de configuração ou método de obtenção de amostras
-de áudio.
-
-A classe \textit{Pd\_Reasoning} é uma extensão da classe de Raciocínio
-do Ensemble e é capaz de trocar mensagens e dados com símbolos específicos 
-em um \textit{patch}, e pode ser utilizada como Raciocínio de um Agente do
-Ensemble. Esta classe é facilmente extensível, para reconhecer novos símbolos,
-tratar as informações que recebe de \textit{patches}, direcionar e processar
-amostras de áudio, além de tudo que já é possível fazer dentro de uma aplicação do 
-Ensemble.
-
-O \textit{Pd\_Reasoning} controla o ciclo de execução de seu \textit{patch},
-mas só tem acesso aos ciclos de processamento do Pd quando o arcabouço
-permite a execução do Raciocínio do Agente correspondente. Isso garante
-que os ciclos do Pd serão executados somente quando um Agente tiver
-permissão de executar seu Raciocínio, e não tomarão tempo de processamento
-do Ensemble.
-
-Além disso, foram implementadas outras classes de apoio à estrutura da
-integração do Pure Data ao Ensemble. A estrutura completa está representada
-na seção~\ref{sec:diagrama}.
-
-\subsection{Múltiplos Patches}
-
-Quando uma instância do \textit{Pd\_Reasoning} planeja executar ciclos de 
-processamento do Pd, ela deve antes habilitar o processamento de ciclos 
-para seu \textit{patch} específico, e desabilitá-lo assim que terminar o 
-processamento.
-
-Esse controle é feito utilizando-se objetos \textbf{switch\~} do Pd,
-identificados por números únicos, fornecidos pelo Pd, que garantem
-que apenas o \textit{patch} correspondente àquele número receberá a
-mensagem de habilitação/desabilitação de ciclos de processamento.
-
-Isso é feito dessa forma para que as amostras de áudio, dados e sinais de 
-controle de \textit{patches} de uma instância específica não interfiram no
-resultado do processamento dos demais.
-
-As demais mensagens são recebidas e direcionadas corretamente pelo 
-\textit{Pd\_Receiver}, que descarta todos os dados antes de receber 
-mensagens de outros \textit{patches}. Caso alguma informação proveniente
-do processamento do Pd precise ser mantida, a aplicação do Ensemble deve
-utilizar a Base de Conhecimentos dos Agentes, ou Parâmetros de Ambiente.
-
-\subsection{Configuração de Aplicação}
-
-A estrutura construída para integrar o Pure Data ao Ensemble,
-juntamente a modificações na classe \textbf{ensemble.tools.Loader}, 
-foi utilizada para permitir que aplicações do Ensemble tenham sua 
-inicialização e configuração a partir de \textit{patches} Pd. 
-As palavras-chave já utilizadas para configuração de
-aplicações a partir de arquivos XML foram mapeadas para o ambiente do Pd,
-e são utilizadas como alvo de mensagens para transmitir parâmetros 
-de configuração ao arcabouço Ensemble.
-
-Qualquer aplicação do Ensemble pode, a partir de agora,  ser configurada através 
-de \textit{patches} Pd, independentemente do uso ou não de funções específicas do Pd na aplicação.
-
+\newpage
 \subsection{Diagrama de Classes}\label{sec:diagrama}
 
 \end{multicols}
