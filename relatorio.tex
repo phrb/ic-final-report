@@ -94,6 +94,11 @@ e suas instâncias representam agentes musicais numa aplicação.
 O mapeamento de um agente definido num \textit{patch} e sua representação no 
 Ensemble é feito através dessa classe.
 
+A classe \textbf{PdAgentClassInformation} encapsula informações sobre
+instâncias de Agentes definidas no \textit{patch}, que são utilizadas na
+inicialização do Ensemble para instanciar e cadastrar esses Agentes no
+JADE.
+
 Os componentes de um Agente, como Raciocínio, Atuadores e Sensores, são
 adicionados a \textbf{PdAgent} através de mensagens definidas dentro do
 \textit{patch}. Atuadores e Sensores são representados pelas classes 
@@ -200,9 +205,33 @@ do \textit{patch}.
 
 \subsection{Abstrações no Pure Data}
 
+Em conjunto com as classes Java foram implementadas abstrações do
+Pure Data, que são facilitadores da comunicação entre Ensemble e Pd
+e encapsulam o uso dos componentes de baixo-nível fornecidos pela
+interface Ensemble-libpd em  novos componentes de alto-nível
+na forma de objetos Pure Data.
+
+O programador Pd pode então utilizar esses objetos para se comunicar
+com o Ensemble utilizando as convenções da linguagem Pure Data,
+sem se preocupar com detalhes de implementação da interface com o
+Ensemble.
+
 \subsubsection{act\textasciitilde e sense\textasciitilde}
 
+Um Atuador de um Agente numa aplicação é representado pela abstração
+\textbf{act\textasciitilde}, e recebe através de um \textit{inlet} 
+um sinal de Áudio que será propagados no Ambiente 
+Virtual e percebidos por outros Agentes de acordo com as regras da aplicação. 
+De forma análoga, a abstração \textbf{sense\textasciitilde} possui um 
+\textit{outlet} através do qual o \textit{patch} recebe os sinais de Áudio 
+percebidos pelo Agente correspondente.
+
+As abstrações \textbf{act} e \textbf{sense}, seguindo a convenção de nomes do
+Pure Data, são utilizadas para a comunicação dos demais tipos de dados.
+
 \subsubsection{read\_memory\textasciitilde e read\_fact}
+
+
 
 \section{Pure Data}
 
@@ -565,9 +594,31 @@ Esta seção fará um breve comentário sobre cada uma delas.
 
 \subsection{Conceitos Fundamentais de Linguagens de Programação}
 
+Nesta disciplina foi construída uma linguagem de programação muito
+simples, sobre a linguagem \textit{Racket}. No processo, estudou-se
+as estruturas sintáticas e semânticas necessárias para a elaboração
+de uma linguagem de programação, por meio da implementação dessas
+estruturas. A linguagem no estado final contém, por exemplo,
+implementações de Funções, Objetos, Ambientes e Escopos.
+
 \subsection{Laboratório de Programação Extrema}
 
+Aborda metodologias de desenvolvimento de software, e as
+diversas técnicas e ferramentas aprendidas são exercitadas em
+um projeto real. Contribuiu para o Projeto de Iniciação Científica
+do aluno com noções de planejamento, organização e integração contínua
+no processo de desenvolvimento de software.
+
 \subsection{Princípios de Interação Humano-Computador}
+
+Esta disciplina estuda o planejamento de interfaces de software voltadas 
+ao usuário, os conceitos e ferramentas abordados também são exercitados
+em um projeto de desenvolvimento de interface. Esta disciplina contribui com
+os objetivos do Projeto de Iniciação Científica desenvolvido pelo aluno,
+pois abordou princípios de elaboração de interfaces e de design centrado
+no usuário.
+
+\end{multicols}
 
 \newpage
 \bibliographystyle{plain}
