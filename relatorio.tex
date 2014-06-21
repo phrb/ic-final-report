@@ -72,51 +72,48 @@ As próximas seções apresentam o detalhamento destas atividades.
 
 \section{O Protocolo}
 
-With the libpd Java bindings, it is possible to divert all requests to any 
-given agent reasoning (in Java) to a call to libpd that causes a Pd patch 
-to be executed, and to collect any data produced by this patch back to 
-the reasoning for further processing by Ensemble (through its actuators, 
-event servers, etc). In such a context the Java-written reasoning is 
-nothing more than a generic \emph{wrapper} that requires only a 
-few parameter inputs (e.g. the Pd patch filename that contains 
-the actual reasoning).
+Através da implementação da libpd na linguagem Java é possível
+realizar a comunicação entre Raciocínios de Agentes inseridos no
+Ensemble e \textit{patches} Pure Data. Neste contexto, o Raciocínio
+Java serve como encapsulador do \textit{patch}, que contém o Raciocínio em si.
 
-In order for this wrapper-reasoning to work, the Pd patch has to adhere to a 
-certain protocol, using specific Pd objects and a well-defined syntax to 
-gain access to the structures contained in the agent's representation in 
-Ensemble. This protocol should define Pd objects for accessing and modifying 
-memories corresponding to existing sensors and actuators and for retrieving 
-and storing data in a knowledge base, which are essential operations in 
-the design of any reasoning. Furthermore, this protocol should also specify 
-Pd objects to create and modify agents and components, and also to define 
-characteristics of the virtual world that were formerly configured 
-in an XML initialization file.
+Para que este encapsulamento funcione, a implementação de um \textit{patch} 
+para uma aplicação do Ensemble deve seguir um protocolo, usando objetos e
+sintaxe bem definidos, para que possa acessar as estruturas contidas nas
+representações de Agentes e demais componentes de uma aplicação no Ensemble.
+Esse protocolo deve definir objetos Pd para acessar e modificar Memórias
+correspondentes a Sensores e Atuadores, e informações na Base de Conhecimentos
+de um Agente, pois essas são estruturas e informações essenciais na elaboração
+de qualquer Raciocínio. Além disso, o protocolo deve definir objetos para
+criação e modificação de Agentes e seus componentes, e dos Ambientes Virtuais
+para execução da aplicação. Finalmente, o protocolo deve fornecer acesso às 
+configurações disponíveis no arquivo XML de configuração e inicialização.
 
-This protocol, defined in the sequel, should aim at complete transparency 
-(from the user point-of-view) with respect to inner workings of the Ensemble 
-framework, that will still be carried out by its Java kernel. In practical 
-terms, no knowledge of the Ensemble Java classes and code should be required 
-from the user of Ensemble through this Pd Ensemble protocol. Ideally, the Pd 
-Ensemble user should not be even aware that any data is coming from or 
-going to the Ensemble Java kernel outside Pd.
+O protocolo definido a seguir procura permitir que aplicações Ensemble sejam
+configuradas sem a necessidade de conhecimento da implementação do Arcabouço
+em Java. Idealmente, não deve ser necessário que o usuário do Ensemble-Pd
+tome conhecimento da troca de informações e mensagens entre seu \textit{patch}
+Pd e o código Java do Ensemble.
 
-\subsection{Environment}
+\subsection{Ambiente}
 
-Ensemble applications can be configured and initialized by an XML file parsed 
-by a loader class, where the user defines the application's components, such 
-as Event Servers, Worlds and its Laws, Musical Agents and their Sensors and 
-Actuators. The Ensemble-Pd interface allows these configuration parameters to 
-be defined by message arguments sent to symbols that Ensemble subscribe to. 
-These messages should be sent at the moment the patch is loaded by Ensemble's 
-Pd instance.
+Aplicações do Ensemble podem ser configuradas através de um arquivo XML
+processado por uma classe de inicialização, onde o usuário define os
+componentes e parâmetros de sua aplicação, como Servidores de Eventos,
+Mundos e Leis, Agente Musicais e seus Componentes. A interface Ensemble-Pd
+permite que esses parâmetros sejam definidos através dos argumentos de 
+mensagens enviadas a símbolos no Pd no momento de inicialização do 
+\textit{patch} pela instância do Pd executada no Ensemble.
 
-Messages sent to the \textbf{global} symbol define Ensemble's clock, 
-schedule and process modes; messages sent to the \textbf{environment} 
-symbol define the Environment Agent, World and Laws; and messages sent to 
-the \textbf{add\_agent} symbol define Musical Agent names that will be added 
-to the application, and whose definition should be in subpatches inside the 
-configuration patch. Table\ref{tab:startupsymbols} shows the Pd symbols and 
-objects used in the initialization, their arguments and usage.
+Mensagens enviadas ao símbolo \textbf{global} definem o modo de
+execução do relógio interno, processamento e agendamento do Ensemble;
+mensagens enviadas ao símbolo \textbf{environment} definem o Agente Ambiente,
+Mundo e Leis; e mensagens enviadas ao símbolo \textbf{add\_agent} definem os
+nomes dos Agentes que devem ser adicionados à aplicação, cuja definição deve
+estar em \textit{subpatches} ou abstrações dentro do patch de configuração.
+
+A Tabela\ref{tab:startupsymbols} apresenta os objetos Pd utilizados no momento
+da inicialização, seu uso e parâmetros.
 
 \end{multicols}
 
@@ -124,7 +121,7 @@ objects used in the initialization, their arguments and usage.
     \begin{center}
         \begin{tabular}{|l|l|l|}
             \hline
-            Symbol/Object & Arguments & Usage \\
+            Símbolo/Objeto & Argumentos & Uso \\
             \hline
         \textbf{global} & \begin{tabular}[c]{@{}l@{}}<clock\_mode>\\<process\_mode>\\<scheduler\_threads>\end{tabular} & \begin{tabular}[c]{@{}l@{}}Sets\\execution\\parameters\end{tabular} \\
             \hline   
@@ -136,31 +133,31 @@ objects used in the initialization, their arguments and usage.
             \hline   
         \end{tabular}
     \end{center}
-    \caption{Application Startup Symbols.}
+    \caption{Símbolos de Inicialização.}
     \label{tab:startupsymbols}
 \end{table}
 
 \begin{multicols}{2}
 
-\subsection{Sensors and Actuators}
+\subsection{Sensores e Atuadores}
 
-Every Musical Agent added to the Pd application has its own subpatch, where 
-its Reasoning, Actuators, Sensors, Memories and Knowledge Base are defined and 
-configured via messages, which are sent to Ensemble symbols when the framework 
-is ready to start processing that Agent. This is done to prevent Ensemble from 
-losing the agent configuration messages, because at the moment of loading the 
-patch Ensemble has not yet received the agents' names, and so could not have 
-subscribed to their symbols. Table\ref{tab:actuatorsandsensors} shows the Pd 
-symbols and objects used in Sensor and Actuator creation and communication, 
-their arguments and usage.
+Todos os Agentes adicionados a uma aplicação no Ensemble-Pd têm seu próprio
+\textit{subpatch} onde são definidos e configurados seu Raciocínio, 
+Sensores, Atuadores, Memórias e Base de Conhecimentos. Essas mensagens
+de configuração são enviadas ao Ensemble quando o Arcabouço inicializa
+os Agentes.
+
+A Tabela\ref{tab:actuatorsandsensors} mostra os símbolos e objetos
+Pd utilizados na comunicação e configuração dos Sensores e Atuadores de
+um Agente.
 
 \end{multicols}
 
-\begin{table}[h]
+\begin{table}[H]
     \begin{center}
         \begin{tabular}{|l|l|l|}
             \hline
-            Symbol/Object & Arguments & Usage \\
+            Símbolo/Objeto & Argumentos & Uso \\
             \hline
         \textbf{add\_actuator} & \begin{tabular}[c]{@{}l@{}}<name>\\<type>\\ {[}<scope>]\end{tabular} & Adds a new Actuator \\
             \hline   
@@ -176,46 +173,35 @@ their arguments and usage.
             \hline
         \end{tabular}
     \end{center}
-    \caption{Actuators and Sensors Symbols.}
+    \caption{Símbolos para Atuadores e Sensores.}
     \label{tab:actuatorsandsensors}
 \end{table}
 
 \begin{multicols}{2}
 
-Ensemble starts agent processing by sending (through libpd) a bang to the 
-symbol \texttt{<\textit{agent}>/start} (see Table\ref{tab:startupsymbols}) 
-which will be received in the application's patch by a Pd object 
-\pdobject{r <\textit{agent}>/start} Messages in the patch connected to this 
-object should contain the names and parameters for the desired components and 
-Knowledge Base facts. Messages in the patch sent to the symbol corresponding 
-to the agent name are used to create components; for instance sending a 
-message to a symbol \texttt{<agent>} with contents \textbf{add\_actuator} 
-or \textbf{add\_sensor} initialize (in Ensemble) the corresponding Sensors 
-and Actuators, and also define the type of Event that this component will 
-handle; optionally this message can define a scope, allowing for private 
-communication between selected actuators and sensors.
+O Ensemble inicializa o processamento dos Agentes enviando, através da libpd,
+um \textbf{bang} para o símbolo \texttt{<\textit{agent}>/start} 
+(veja a Tabela\ref{tab:startupsymbols}), que será recebido no \textit{patch}
+através do objeto \pdobject{r <\textit{agent}>/start} ao qual devem estar
+conectadas as mensagens de inicialização do Agente.
 
-\subsection{Knowledge Base}
+\subsection{Base de Conhecimentos}
 
-Adding facts to the Knowledge Base at agent startup time is done by sending a 
-message with the fact name and value to the symbol \textbf{new\_fact}. 
-Facts can later be recovered by sending messages to the object 
-\pdobject{read\_fact <agent\_name>} which receives a fact name in its 
-inlet and returns the value in its outlet (assuming the fact exists in the 
-agent's Knowledge Base). Updating the fact in the agent's Knowledge Base 
-is done via messages to the object \pdobject{update\_fact <agent\_name>} that 
-receives a fact name and new value in its inlet and updates the Knowledge Base 
-accordingly. In Table\ref{tab:kbprotocol} are the Pd symbols and objects used in 
-creating, accessing, removing and updating a fact in the Agent's Knowledge 
-Base, their arguments and usage.
+Mensagens enviadas ao símbolo \textbf{new\_fact} adicionam um novo Fato
+à Base de Conhecimentos de um Agente, e devem conter um nome e um valor.
+Fatos adicionados podem ser recuperados e modificados através dos objetos
+Pd \pdobject{read\_fact <agent\_name>} \pdobject{update\_fact <agent\_name>} 
+
+Na Tabela\ref{tab:kbprotocol} estão os símbolos e objetos utilizados no
+acesso e modificação da Base de Conhecimentos de um Agente.
 
 \end{multicols}
 
-\begin{table}[h]
+\begin{table}[H]
     \begin{center}
         \begin{tabular}{|l|l|l|}
             \hline
-            Symbol/Object & Arguments & Usage \\
+            Símbolo/Objeto & Argumentos & Uso \\
             \hline
         \textbf{new\_fact} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<value>\end{tabular} & Adds a new Fact\\
             \hline   
@@ -228,30 +214,28 @@ Base, their arguments and usage.
             \hline
         \end{tabular}
     \end{center}
-    \caption{Knowledge Base Symbols.}
+    \caption{Símbolos para a Base de Conhecimentos.}
     \label{tab:kbprotocol}
 \end{table}
 
 \begin{multicols}{2}
 
-\subsection{Memories}
+\subsection{Memórias}
 
-In the same way, different types of Agent Memories can be created and read 
-from with messages to the symbols \textbf{new\_memory} and 
-\textbf{read\_memory}. To read from a memory, a message must specify a 
-memory name and a time value; when writing to a memory (e.g. an actuator's 
-memory), the value sent to the symbol \textbf{write\_memory} is written in the 
-specified Memory at the current processing time. Table\ref{tab:memprotocol} 
-presents the Pd symbols and objects used in Memory creation, writing and 
-reading, their arguments and usage.
+Da mesma forma, diferentes tipos de Memórias podem ser criadas, acessadas e
+modificadas através de mensagens aos símbolos \textbf{new\_memory}, 
+\textbf{read\_memory} e \textbf{write\_memory}. 
+
+A Tabela\ref{tab:memprotocol} contém os símbolos e objetos utilizados
+pelo protocolo na manipulação de Memórias.
 
 \end{multicols}
 
-\begin{table}[h]
+\begin{table}[H]
     \begin{center}
         \begin{tabular}{|l|l|l|}
             \hline
-            Symbol/Object & Arguments & Usage \\
+            Símbolo/Objeto & Argumentos & Uso \\
             \hline
         \textbf{new\_memory} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<type>\\\end{tabular} & Adds a new Memory \\
             \hline 
@@ -261,7 +245,7 @@ reading, their arguments and usage.
             \hline
         \end{tabular}
     \end{center}
-    \caption{Memory Symbols.}
+    \caption{Símbolos para Memória.}
     \label{tab:memprotocol}
 \end{table}
 
