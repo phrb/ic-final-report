@@ -123,13 +123,13 @@ da inicialização, seu uso e parâmetros.
             \hline
             Símbolo/Objeto & Argumentos & Uso \\
             \hline
-        \textbf{global} & \begin{tabular}[c]{@{}l@{}}<clock\_mode>\\<process\_mode>\\<scheduler\_threads>\end{tabular} & \begin{tabular}[c]{@{}l@{}}Sets\\execution\\parameters\end{tabular} \\
+        \textbf{global} & \begin{tabular}[c]{@{}l@{}}<clock\_mode>\\<process\_mode>\\<scheduler\_threads>\end{tabular} & \begin{tabular}[c]{@{}l@{}}Define\\parâmetros\\de execução\end{tabular} \\
             \hline   
-        \textbf{environment} & \begin{tabular}[c]{@{}l@{}}<class>\\<world>\\<\textit{world\_class}>\\ {[}<\textit{world\_law}>]\end{tabular} & \begin{tabular}[c]{@{}l@{}}Sets\\environment\\and world\\parameters\end{tabular} \\
+        \textbf{environment} & \begin{tabular}[c]{@{}l@{}}<class>\\<world>\\<\textit{world\_class}>\\ {[}<\textit{world\_law}>]\end{tabular} & \begin{tabular}[c]{@{}l@{}}Define\\parâmetros\\de Ambiente\\e Mundo\end{tabular} \\
             \hline
-        \textbf{add\_agent} & <name> & \begin{tabular}[c]{@{}l@{}}Adds\\an Agent\end{tabular}\\
+        \textbf{add\_agent} & <name> & \begin{tabular}[c]{@{}l@{}}Adiciona\\um Agente\end{tabular}\\
             \hline
-        \textbf{[r <\textit{agent}>/start]} & & \begin{tabular}[c]{@{}l@{}}Receives\\agent\\startup bang\end{tabular} \\
+        \textbf{[r <\textit{agent}>/start]} & & \begin{tabular}[c]{@{}l@{}}Recebe\\bang de\\inicialização\end{tabular} \\
             \hline   
         \end{tabular}
     \end{center}
@@ -159,17 +159,17 @@ um Agente.
             \hline
             Símbolo/Objeto & Argumentos & Uso \\
             \hline
-        \textbf{add\_actuator} & \begin{tabular}[c]{@{}l@{}}<name>\\<type>\\ {[}<scope>]\end{tabular} & Adds a new Actuator \\
+        \textbf{add\_actuator} & \begin{tabular}[c]{@{}l@{}}<name>\\<type>\\ {[}<scope>]\end{tabular} & Adiciona novo Atuador \\
             \hline   
-        \textbf{add\_sensor} & \begin{tabular}[c]{@{}l@{}}<name>\\<type>\\ {[}<scope>]\end{tabular} & Adds a new Sensor \\
+        \textbf{add\_sensor} & \begin{tabular}[c]{@{}l@{}}<name>\\<type>\\ {[}<scope>]\end{tabular} & Adiciona novo Sensor \\
             \hline
-            \textbf{remove\_actuator} & <name> & Removes an Actuator \\
+            \textbf{remove\_actuator} & <name> & Remove um Atuador \\
             \hline
-            \textbf{remove\_sensor} & <name> & Removes a Sensor \\
+            \textbf{remove\_sensor} & <name> & Remove um Sensor \\
             \hline
-        \textbf{[s \textit{actuator\_name}]} & \begin{tabular}[c]{@{}l@{}}<data>\\ {[}<scope>]\end{tabular} & \begin{tabular}[c]{@{}l@{}}Writes data \\ to \textit{actuator\_name}\end{tabular} \\
+        \textbf{[s \textit{actuator\_name}]} & \begin{tabular}[c]{@{}l@{}}<data>\\ {[}<scope>]\end{tabular} & \begin{tabular}[c]{@{}l@{}}Escreve dados\\ em \textit{actuator\_name}\end{tabular} \\
             \hline
-        \textbf{[r \textit{sensor\_name}]} & & \begin{tabular}[c]{@{}l@{}}Receives data\\from \textit{sensor\_name}\end{tabular} \\
+        \textbf{[r \textit{sensor\_name}]} & & \begin{tabular}[c]{@{}l@{}}Recebe dados\\de \textit{sensor\_name}\end{tabular} \\
             \hline
         \end{tabular}
     \end{center}
@@ -203,14 +203,14 @@ acesso e modificação da Base de Conhecimentos de um Agente.
             \hline
             Símbolo/Objeto & Argumentos & Uso \\
             \hline
-        \textbf{new\_fact} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<value>\end{tabular} & Adds a new Fact\\
+        \textbf{new\_fact} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<value>\end{tabular} & Adiciona novo Fato\\
             \hline   
-        \textbf{update\_fact} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<value>\end{tabular} & \begin{tabular}[c]{@{}l@{}}Updates a\\fact if it\\exists\end{tabular}\\
+        \textbf{update\_fact} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<value>\end{tabular} & \begin{tabular}[c]{@{}l@{}}Atualiza um\\fato se ele\\existir\end{tabular}\\
             \hline
-            \textbf{remove\_fact} & name & Removes a Fact\\
+            \textbf{remove\_fact} & name & Remove um Fato\\
             \hline
         \textbf{[read\_fact]} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<value>\end{tabular}
-                              & \begin{tabular}[c]{@{}l@{}}Reads a \\Fact and\\returns a value\end{tabular}\\
+                              & \begin{tabular}[c]{@{}l@{}}Lê um \\Fato e\\devolve seu valor\end{tabular}\\
             \hline
         \end{tabular}
     \end{center}
@@ -237,11 +237,11 @@ pelo protocolo na manipulação de Memórias.
             \hline
             Símbolo/Objeto & Argumentos & Uso \\
             \hline
-        \textbf{new\_memory} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<type>\\\end{tabular} & Adds a new Memory \\
+        \textbf{new\_memory} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<type>\\\end{tabular} & Adiciona nova Memória \\
             \hline 
-        \textbf{write\_memory} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<value>\end{tabular} & \begin{tabular}[c]{@{}l@{}}Writes to a \\Memory at\\current time\end{tabular} \\
+        \textbf{write\_memory} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<value>\end{tabular} & \begin{tabular}[c]{@{}l@{}}Escreve numa \\Memória no\\instante atual\end{tabular} \\
             \hline
-        \textbf{read\_memory} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<time>\end{tabular} & \begin{tabular}[c]{@{}l@{}}Reads a \\Memory and\\returns a value\end{tabular} \\
+        \textbf{read\_memory} & \begin{tabular}[c]{@{}l@{}}<agent>\\<name>\\<time>\end{tabular} & \begin{tabular}[c]{@{}l@{}}Lê uma \\Memória e\\devolve um valor\end{tabular} \\
             \hline
         \end{tabular}
     \end{center}
@@ -460,6 +460,22 @@ em um projeto de desenvolvimento de interface. Esta disciplina contribui com
 os objetivos do Projeto de Iniciação Científica desenvolvido pelo aluno,
 pois abordou princípios de elaboração de interfaces e de design centrado
 no usuário.
+
+\section{Conclusão}
+
+Os objetivos do Projeto foram atingidos, pois o protocolo definido mapeia
+os conceitos e funcionalidades do Arcabouço Ensemble em abstrações,
+mensagens e símbolos de um \textit{patch} Pure Data, e a interface Ensemble-Pd
+permite a implementação de Agentes, Ambientes e Raciocínios do Ensemble através
+do Pure Data. O protocolo e a interface permitem a um usuário implementar 
+aplicações do Arcabouço Ensemble mesmo que ele não possua conhecimento sobre
+programação em linguagem Java, desde que saiba programar em Pure Data. 
+No entanto, algumas flexibilidades características do Arcabouço são perdidas
+devido ao alto nível de abstração da interface do Pure Data, sendo ainda 
+necessário o conhecimento de Java para implementar, por exemplo, novas leis 
+de propagação sonora ou de interação entre os Agentes, e novos tipos de dados
+a ser tratados pela Aplicação, como por exemplo novos tipos deEventos do 
+Ensemble.
 
 \end{multicols}
 
